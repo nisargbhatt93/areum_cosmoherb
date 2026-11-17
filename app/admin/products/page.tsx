@@ -8,6 +8,8 @@ export const metadata = {
   title: 'Manage Products | Areum Cosmoherb Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({
     include: {

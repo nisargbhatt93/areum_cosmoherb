@@ -18,6 +18,8 @@ export const metadata = {
   title: 'Operations Dashboard | Areum Cosmoherb Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminDashboardPage() {
   // 1. Fetch live metrics from database
   const [

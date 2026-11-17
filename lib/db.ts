@@ -1,5 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 
+// Ensure DATABASE_URL is defined during Next.js build / SSG
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = 'file:./dev.db'
+}
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }

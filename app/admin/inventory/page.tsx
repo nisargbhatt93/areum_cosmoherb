@@ -5,6 +5,8 @@ export const metadata = {
   title: 'Inventory Management | Areum Cosmoherb Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminInventoryPage() {
   const products = await prisma.product.findMany({
     where: { status: 'active' },

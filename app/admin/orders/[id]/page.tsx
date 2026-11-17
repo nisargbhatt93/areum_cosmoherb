@@ -4,6 +4,8 @@ import prisma from '@/lib/db'
 import { ArrowLeft } from 'lucide-react'
 import OrderDetailClient from './OrderDetailClient'
 
+export const dynamic = 'force-dynamic'
+
 interface AdminOrderDetailPageProps {
   params: Promise<{ id: string }>
 }

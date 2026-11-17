@@ -6,6 +6,8 @@ export const metadata = {
   title: 'Analytics & CRO Insights | Areum Cosmoherb Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminAnalyticsPage() {
   const [
     events,

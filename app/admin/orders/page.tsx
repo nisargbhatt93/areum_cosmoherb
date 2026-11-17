@@ -11,6 +11,8 @@ export const metadata = {
   title: 'Manage Orders | Areum Cosmoherb Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 const TABS = [
   { label: 'All Orders', status: '' },
   { label: 'Pending', status: 'pending' },

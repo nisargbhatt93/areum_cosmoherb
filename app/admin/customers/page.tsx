@@ -6,6 +6,8 @@ export const metadata = {
   title: 'Customer Directory | Areum Cosmoherb Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminCustomersPage() {
   const customers = await prisma.user.findMany({
     where: { role: 'customer' },

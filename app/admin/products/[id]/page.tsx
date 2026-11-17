@@ -4,6 +4,8 @@ import prisma from '@/lib/db'
 import { ArrowLeft } from 'lucide-react'
 import EditProductForm from './EditProductForm'
 
+export const dynamic = 'force-dynamic'
+
 interface EditProductPageProps {
   params: Promise<{ id: string }>
 }
