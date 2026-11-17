@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 
 export default function HeroSection() {
@@ -24,10 +25,12 @@ export default function HeroSection() {
 
       <div className="container-custom relative z-10 py-20">
         <div className="max-w-3xl">
-          {/* Tag */}
-          <div className="inline-flex items-center gap-2 bg-brand-700/50 border border-brand-500/30 text-brand-200 rounded-full px-4 py-1.5 text-sm font-medium mb-8">
-            <span className="w-1.5 h-1.5 bg-brand-300 rounded-full" />
-            Natural Herbal Personal Care
+          {/* Official Tagline Badge */}
+          <div className="inline-flex items-center gap-2.5 bg-brand-700/70 border border-gold-400/40 text-gold-200 rounded-full pl-2 pr-4 py-1.5 text-xs sm:text-sm font-medium mb-8 shadow-sm backdrop-blur-xs">
+            <div className="relative w-5 h-5 rounded-full overflow-hidden border border-gold-400/80 bg-brand-900 flex-shrink-0">
+              <Image src="/logo.jpg" alt="Areum Emblem" fill className="object-cover" />
+            </div>
+            <span>Where Nature Creates Beauty</span>
           </div>
 
           {/* Headline */}

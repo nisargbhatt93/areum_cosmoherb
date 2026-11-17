@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
 @import "tailwindcss";
 
-
 @theme {
   /* Areum Cosmoherb Brand Colors */
   --color-brand-900: #0d2318;
@@ -116,19 +115,19 @@
 @layer components {
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-700 text-white font-medium rounded-lg transition-all duration-200 hover:bg-brand-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-700 text-white font-medium rounded-lg transition-all duration-200 hover:bg-brand-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 cursor-pointer;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-brand-700 font-medium border border-brand-700 rounded-lg transition-all duration-200 hover:bg-brand-50 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-brand-700 font-medium border border-brand-700 rounded-lg transition-all duration-200 hover:bg-brand-50 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-transparent text-charcoal-700 font-medium rounded-lg transition-all duration-200 hover:bg-charcoal-100 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-transparent text-charcoal-700 font-medium rounded-lg transition-all duration-200 hover:bg-charcoal-100 active:scale-[0.98] cursor-pointer;
   }
 
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 text-white font-medium rounded-lg transition-all duration-200 hover:bg-gold-600 active:scale-[0.98] disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 text-white font-medium rounded-lg transition-all duration-200 hover:bg-gold-600 active:scale-[0.98] disabled:opacity-50 cursor-pointer;
   }
 
   /* Cards */
@@ -205,24 +204,9 @@
   .star-empty {
     @apply text-charcoal-200 fill-charcoal-200;
   }
-
-  /* Admin sidebar */
-  .admin-nav-item {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-charcoal-600 font-medium transition-colors hover:bg-brand-50 hover:text-brand-700;
-  }
-
-  .admin-nav-item-active {
-    @apply bg-brand-50 text-brand-700;
-  }
-
-  /* Trust badge */
-  .trust-item {
-    @apply flex flex-col items-center gap-2 text-center px-4;
-  }
 }
 
 @layer utilities {
-  /* Custom scrollbar */
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: #9fd4b8 transparent;
@@ -242,7 +226,6 @@
     border-radius: 2px;
   }
 
-  /* Text gradient */
   .text-gradient {
     background: linear-gradient(135deg, #2d6347, #c4a04a);
     -webkit-background-clip: text;
@@ -250,13 +233,7 @@
     background-clip: text;
   }
 
-  /* Hover lift */
   .hover-lift {
     @apply transition-transform duration-200 hover:-translate-y-1;
-  }
-
-  /* Free shipping bar fill */
-  .shipping-bar-fill {
-    transition: width 0.4s ease;
   }
 }

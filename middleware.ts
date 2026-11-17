@@ -5,8 +5,8 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Admin route protection
-  if (pathname.startsWith('/admin')) {
+  // Admin route protection - exclude /admin/login from redirect loop
+  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     // Check for admin session via cookie
     const adminSession = request.cookies.get('admin-session')
     if (!adminSession) {

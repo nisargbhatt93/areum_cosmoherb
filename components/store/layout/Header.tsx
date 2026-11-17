@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { ShoppingCart, Heart, Search, User, Menu, X, ChevronDown, Leaf } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
@@ -35,9 +36,39 @@ export default function Header() {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(true)
+  const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const navRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const cartCount = useCartStore((s) => s.getItemCount())
   const wishlistCount = useWishlistStore((s) => s.items.length)
+
+  const handleMouseEnter = (label: string) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current)
+      dropdownTimeoutRef.current = null
+    }
+    setOpenDropdown(label)
+  }
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null)
+    }, 200)
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10)
@@ -47,6 +78,7 @@ export default function Header() {
 
   useEffect(() => {
     setIsMobileMenuOpen(false)
+    setOpenDropdown(null)
   }, [pathname])
 
   return (
@@ -66,48 +98,78 @@ export default function Header() {
       >
         <div className="container-custom">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-8 h-8 bg-brand-700 rounded-full flex items-center justify-center">
-                <Leaf className="w-4 h-4 text-white" />
+            {/* Official Brand Logo */}
+            <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
+              <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border border-gold-400/60 shadow-xs flex-shrink-0 bg-brand-900 ring-2 ring-brand-100/50">
+                <Image
+                  src="/logo.jpg"
+                  alt="Areum Cosmoherb Logo"
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
               <div className="leading-tight">
                 <span
-                  className="block text-brand-800 font-bold text-lg leading-none"
+                  className="block text-brand-900 font-bold text-lg md:text-xl tracking-wider leading-none"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
-                  Areum
+                  AREUM
                 </span>
-                <span className="block text-brand-600 text-xs tracking-widest uppercase leading-none">
-                  Cosmoherb
+                <span className="block text-brand-700 text-[8px] md:text-[9.5px] tracking-wider uppercase font-semibold leading-none mt-1">
+                  Where Nature Creates Beauty
                 </span>
               </div>
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav ref={navRef} className="hidden lg:flex items-center gap-1">
               {NAV_LINKS.map((link) =>
                 link.children ? (
                   <div
                     key={link.label}
-                    className="relative"
-                    onMouseEnter={() => setOpenDropdown(link.label)}
-                    onMouseLeave={() => setOpenDropdown(null)}
+                    className="relative group py-2"
+                    onMouseEnter={() => handleMouseEnter(link.label)}
+                    onMouseLeave={handleMouseLeave}
                   >
-                    <button className="flex items-center gap-1 px-3 py-2 text-charcoal-700 hover:text-brand-700 font-medium text-sm transition-colors rounded-lg hover:bg-brand-50">
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === link.label ? null : link.label)}
+                      className={`flex items-center gap-1 px-3 py-2 font-medium text-sm transition-colors rounded-lg ${
+                        openDropdown === link.label
+                          ? 'text-brand-800 bg-brand-50'
+                          : 'text-charcoal-700 hover:text-brand-700 hover:bg-brand-50'
+                      }`}
+                      aria-expanded={openDropdown === link.label}
+                    >
                       {link.label}
-                      <ChevronDown className="w-3 h-3" />
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          openDropdown === link.label ? 'rotate-180 text-brand-700' : ''
+                        }`}
+                      />
                     </button>
                     {openDropdown === link.label && (
-                      <div className="absolute top-full left-0 pt-1 w-48 z-50">
-                        <div className="bg-white rounded-xl shadow-lg border border-charcoal-100 py-2">
+                      <div
+                        className="absolute top-full left-0 pt-1 z-50 w-56"
+                        onMouseEnter={() => handleMouseEnter(link.label)}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <div className="bg-white rounded-2xl shadow-xl border border-charcoal-100 py-2.5 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+                          <div className="px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-charcoal-400 border-b border-charcoal-50 mb-1">
+                            Browse Categories
+                          </div>
                           {link.children.map((child) => (
                             <Link
                               key={child.label}
                               href={child.href}
-                              className="block px-4 py-2.5 text-sm text-charcoal-700 hover:text-brand-700 hover:bg-brand-50 transition-colors"
+                              onClick={() => setOpenDropdown(null)}
+                              className="flex items-center justify-between px-4 py-2.5 text-sm text-charcoal-700 hover:text-brand-800 hover:bg-brand-50/80 transition-colors group/item"
                             >
-                              {child.label}
+                              <span>{child.label}</span>
+                              <span className="text-brand-400 opacity-0 group-hover/item:opacity-100 transition-opacity text-xs">
+                                →
+                              </span>
                             </Link>
                           ))}
                         </div>
@@ -192,24 +254,43 @@ export default function Header() {
             <div className="container-custom py-4 space-y-1">
               {NAV_LINKS.map((link) => (
                 <div key={link.label}>
-                  <Link
-                    href={link.href === '#' ? '/shop' : link.href}
-                    className="block px-4 py-3 text-charcoal-700 font-medium rounded-lg hover:bg-brand-50 hover:text-brand-700 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                  {link.children && (
-                    <div className="pl-4 space-y-0.5">
-                      {link.children.map((child) => (
-                        <Link
-                          key={child.label}
-                          href={child.href}
-                          className="block px-4 py-2 text-sm text-charcoal-600 hover:text-brand-700 rounded-lg transition-colors"
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
+                  {link.children ? (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setMobileCategoriesOpen(!mobileCategoriesOpen)}
+                        className="w-full flex items-center justify-between px-4 py-3 text-charcoal-800 font-medium rounded-lg hover:bg-brand-50 hover:text-brand-700 transition-colors"
+                      >
+                        <span>{link.label}</span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-charcoal-400 transition-transform duration-200 ${
+                            mobileCategoriesOpen ? 'rotate-180 text-brand-600' : ''
+                          }`}
+                        />
+                      </button>
+                      {mobileCategoriesOpen && (
+                        <div className="pl-4 pr-2 py-1 space-y-1 bg-brand-50/40 rounded-xl my-1 border border-brand-100/50">
+                          {link.children.map((child) => (
+                            <Link
+                              key={child.label}
+                              href={child.href}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="block px-3 py-2 text-sm text-charcoal-700 hover:text-brand-800 hover:bg-white rounded-lg transition-colors font-medium"
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                     </div>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-4 py-3 text-charcoal-700 font-medium rounded-lg hover:bg-brand-50 hover:text-brand-700 transition-colors"
+                    >
+                      {link.label}
+                    </Link>
                   )}
                 </div>
               ))}
