@@ -3,17 +3,31 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Plus, Check } from 'lucide-react'
+import { ArrowLeft, Plus } from 'lucide-react'
 import { toast } from 'sonner'
+import ImageUploader from '@/components/admin/ImageUploader'
+
+// Default fallback categories so dropdown is never empty
+const DEFAULT_CATEGORIES = [
+  { id: 'cmtopj82o000btpm8aewt1zxt', name: 'Hair Care' },
+  { id: 'cmtopj82v000ctpm8kkr3qkg9', name: 'Skin Care' },
+  { id: 'cmtopj832000dtpm8dsra4680', name: 'Bath & Body' },
+  { id: 'cmtopj83a000etpm8dwv1dx43', name: 'Lip Care' },
+  { id: 'cmtopj83i000ftpm8hukasawl', name: 'Hair Color' },
+  { id: 'cmtopj83r000gtpm88pdzh6al', name: 'Combo Packs' },
+]
 
 export default function NewProductPage() {
   const router = useRouter()
-  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showNewCatInput, setShowNewCatInput] = useState(false)
+  const [newCatName, setNewCatName] = useState('')
+  const [isCreatingCat, setIsCreatingCat] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
-    categoryId: '',
+    categoryId: DEFAULT_CATEGORIES[0].id,
     price: '',
     mrp: '',
     stock: '25',
@@ -40,11 +54,33 @@ export default function NewProductPage() {
       .then((data) => {
         if (data.categories?.length > 0) {
           setCategories(data.categories)
-          setFormData((prev) => ({ ...prev, categoryId: data.categories[0].id }))
         }
       })
       .catch(() => null)
   }, [])
+
+  const handleCreateCategory = async () => {
+    if (!newCatName.trim()) return
+    setIsCreatingCat(true)
+    try {
+      const res = await fetch('/api/admin/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newCatName.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to create category')
+      setCategories((prev) => [...prev, data.category])
+      setFormData((prev) => ({ ...prev, categoryId: data.category.id }))
+      setNewCatName('')
+      setShowNewCatInput(false)
+      toast.success(`Category "${data.category.name}" created!`)
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create category.')
+    } finally {
+      setIsCreatingCat(false)
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
@@ -127,17 +163,51 @@ export default function NewProductPage() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-charcoal-600 block mb-1">Category *</label>
-              <select
-                name="categoryId"
-                value={formData.categoryId}
-                onChange={handleChange}
-                className="input-field text-sm"
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold text-charcoal-600">Category *</label>
+                <button
+                  type="button"
+                  onClick={() => setShowNewCatInput(!showNewCatInput)}
+                  className="text-[11px] font-semibold text-brand-700 hover:text-brand-800"
+                >
+                  {showNewCatInput ? 'Cancel' : '+ New Category'}
+                </button>
+              </div>
+
+              {showNewCatInput ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCatName}
+                    onChange={(e) => setNewCatName(e.target.value)}
+                    placeholder="e.g. Body Lotions"
+                    className="input-field text-sm flex-1"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateCategory}
+                    disabled={isCreatingCat || !newCatName.trim()}
+                    className="btn-primary text-xs px-3 disabled:opacity-50"
+                  >
+                    {isCreatingCat ? '...' : 'Add'}
+                  </button>
+                </div>
+              ) : (
+                <select
+                  name="categoryId"
+                  required
+                  value={formData.categoryId}
+                  onChange={handleChange}
+                  className="input-field text-sm cursor-pointer"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div>
@@ -244,19 +314,14 @@ export default function NewProductPage() {
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-charcoal-100 shadow-2xs space-y-4">
           <h2 className="font-bold text-sm text-charcoal-900 border-b border-charcoal-100 pb-3">Media & Formulation Details</h2>
 
-          <div>
-            <label className="text-xs font-semibold text-charcoal-600 block mb-1">Primary Image URL</label>
-            <input
-              type="url"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              placeholder="https://images.unsplash.com/..."
-              className="input-field text-sm"
-            />
-          </div>
+          {/* Direct Image Upload Component */}
+          <ImageUploader
+            label="Product Image *"
+            value={formData.imageUrl}
+            onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+          />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div>
               <label className="text-xs font-semibold text-charcoal-600 block mb-1">Net Weight (grams)</label>
               <input

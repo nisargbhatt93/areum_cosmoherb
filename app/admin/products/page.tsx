@@ -76,7 +76,7 @@ export default async function AdminProductsPage() {
                     <tr key={p.id} className="hover:bg-cream-50/50 transition-colors">
                       <td className="p-3.5 flex items-center gap-3">
                         <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-cream-100 flex-shrink-0">
-                          <Image src={img} alt={p.name} fill className="object-cover" />
+                          <Image src={img} alt={p.name} fill unoptimized={img.startsWith('data:')} className="object-cover" />
                         </div>
                         <div className="min-w-0 max-w-xs">
                           <Link href={`/product/${p.slug}`} target="_blank" className="font-bold text-charcoal-900 hover:text-brand-700 line-clamp-1 flex items-center gap-1">

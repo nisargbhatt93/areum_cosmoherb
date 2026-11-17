@@ -5,33 +5,48 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Archive } from 'lucide-react'
+import ImageUploader from '@/components/admin/ImageUploader'
+
+const DEFAULT_CATEGORIES = [
+  { id: 'cmtopj82o000btpm8aewt1zxt', name: 'Hair Care' },
+  { id: 'cmtopj82v000ctpm8kkr3qkg9', name: 'Skin Care' },
+  { id: 'cmtopj832000dtpm8dsra4680', name: 'Bath & Body' },
+  { id: 'cmtopj83a000etpm8dwv1dx43', name: 'Lip Care' },
+  { id: 'cmtopj83i000ftpm8hukasawl', name: 'Hair Color' },
+  { id: 'cmtopj83r000gtpm88pdzh6al', name: 'Combo Packs' },
+]
 
 interface EditProductFormProps {
   product: any
   categories: Array<{ id: string; name: string }>
 }
 
-export default function EditProductForm({ product, categories }: EditProductFormProps) {
+export default function EditProductForm({ product, categories = [] }: EditProductFormProps) {
   const router = useRouter()
   const [isSaving, setIsSaving] = useState(false)
   const [isArchiving, setIsArchiving] = useState(false)
 
+  // Use passed categories or fallback
+  const categoryList = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES
+
   const [formData, setFormData] = useState({
     name: product.name,
+    categoryId: product.categoryId || categoryList[0]?.id || '',
+    imageUrl: product.images?.[0]?.url || '',
     price: product.price.toString(),
     mrp: product.mrp.toString(),
     stock: product.stock.toString(),
-    lowStockThreshold: product.lowStockThreshold.toString(),
+    lowStockThreshold: (product.lowStockThreshold || 10).toString(),
     description: product.description,
     shortDescription: product.shortDescription || '',
     badge: product.badge || '',
     benefits: product.benefits || '',
     howToUse: product.howToUse || '',
     precautions: product.precautions || '',
-    status: product.status,
-    isBestSeller: product.isBestSeller,
-    isNewArrival: product.isNewArrival,
-    isTrending: product.isTrending,
+    status: product.status || 'active',
+    isBestSeller: !!product.isBestSeller,
+    isNewArrival: !!product.isNewArrival,
+    isTrending: !!product.isTrending,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -106,6 +121,37 @@ export default function EditProductForm({ product, categories }: EditProductForm
           </div>
 
           <div>
+            <label className="text-xs font-semibold text-charcoal-600 block mb-1">Category *</label>
+            <select
+              name="categoryId"
+              required
+              value={formData.categoryId}
+              onChange={handleChange}
+              className="input-field text-sm cursor-pointer"
+            >
+              {categoryList.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-charcoal-600 block mb-1">Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="input-field text-sm capitalize"
+            >
+              <option value="active">Active (Visible)</option>
+              <option value="inactive">Inactive</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <div>
             <label className="text-xs font-semibold text-charcoal-600 block mb-1">Selling Price (₹) *</label>
             <input
               type="number"
@@ -142,26 +188,36 @@ export default function EditProductForm({ product, categories }: EditProductForm
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-charcoal-600 block mb-1">Status</label>
-            <select
-              name="status"
-              value={formData.status}
+            <label className="text-xs font-semibold text-charcoal-600 block mb-1">Low Stock Alert *</label>
+            <input
+              type="number"
+              required
+              name="lowStockThreshold"
+              value={formData.lowStockThreshold}
               onChange={handleChange}
-              className="input-field text-sm capitalize"
-            >
-              <option value="active">Active (Visible)</option>
-              <option value="inactive">Inactive</option>
-              <option value="archived">Archived</option>
-            </select>
+              className="input-field text-sm"
+            />
           </div>
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-charcoal-600 block mb-1">Badge</label>
+          <label className="text-xs font-semibold text-charcoal-600 block mb-1">Badge Tag</label>
           <input
             type="text"
             name="badge"
             value={formData.badge}
+            onChange={handleChange}
+            placeholder="e.g. Best Seller, Pure Bliss"
+            className="input-field text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-charcoal-600 block mb-1">Short Description</label>
+          <input
+            type="text"
+            name="shortDescription"
+            value={formData.shortDescription}
             onChange={handleChange}
             className="input-field text-sm"
           />
@@ -212,13 +268,24 @@ export default function EditProductForm({ product, categories }: EditProductForm
         </div>
       </div>
 
+      {/* Media / Image Upload Card */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-charcoal-100 shadow-2xs space-y-4">
+        <h2 className="font-bold text-sm text-charcoal-900 border-b border-charcoal-100 pb-3">Product Media</h2>
+
+        <ImageUploader
+          label="Primary Product Image"
+          value={formData.imageUrl}
+          onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+        />
+      </div>
+
       {/* Buttons */}
       <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={handleArchive}
           disabled={isArchiving}
-          className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold"
+          className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1 font-semibold cursor-pointer"
         >
           <Archive className="w-4 h-4" /> Archive Product
         </button>
@@ -230,7 +297,7 @@ export default function EditProductForm({ product, categories }: EditProductForm
           <button
             type="submit"
             disabled={isSaving}
-            className="btn-primary text-xs py-2.5 px-6 disabled:opacity-50"
+            className="btn-primary text-xs py-2.5 px-6 disabled:opacity-50 cursor-pointer"
           >
             {isSaving ? 'Saving Changes...' : 'Save Changes'}
           </button>

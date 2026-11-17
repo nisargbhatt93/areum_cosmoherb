@@ -17,6 +17,7 @@ export async function PUT(
         mrp: body.mrp ? parseFloat(body.mrp) : undefined,
         stock: body.stock !== undefined ? parseInt(body.stock) : undefined,
         lowStockThreshold: body.lowStockThreshold !== undefined ? parseInt(body.lowStockThreshold) : undefined,
+        categoryId: body.categoryId || undefined,
         description: body.description,
         shortDescription: body.shortDescription,
         status: body.status,
@@ -30,6 +31,18 @@ export async function PUT(
         precautions: body.precautions,
       },
     })
+
+    if (body.imageUrl) {
+      await prisma.productImage.deleteMany({ where: { productId: id } })
+      await prisma.productImage.create({
+        data: {
+          productId: id,
+          url: body.imageUrl,
+          isPrimary: true,
+          sortOrder: 0,
+        },
+      })
+    }
 
     return NextResponse.json({ success: true, product })
   } catch (error: any) {

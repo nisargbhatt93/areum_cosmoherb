@@ -100,6 +100,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           src={image}
           alt={product.images[0]?.alt || product.name}
           fill
+          unoptimized={image.startsWith('data:')}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />

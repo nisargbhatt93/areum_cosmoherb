@@ -116,6 +116,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     src={item.image || 'https://placehold.co/64x64/edf7f2/1a3a2a?text=A'}
                     alt={item.name}
                     fill
+                    unoptimized={(item.image || '').startsWith('data:')}
                     className="object-cover"
                   />
                 </div>

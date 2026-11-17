@@ -116,6 +116,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               src={activeImage.url}
               alt={activeImage.alt || product.name}
               fill
+              unoptimized={activeImage.url.startsWith('data:')}
               className="object-cover"
               priority
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -145,7 +146,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     selectedImageIndex === idx ? 'border-brand-700 ring-2 ring-brand-200' : 'border-charcoal-200 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <Image src={img.url} alt="" fill className="object-cover" />
+                  <Image src={img.url} alt="" fill unoptimized={img.url.startsWith('data:')} className="object-cover" />
                 </button>
               ))}
             </div>
