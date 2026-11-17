@@ -8,7 +8,12 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminSettingsPage() {
-  const settingsRecords = await prisma.storeSettings.findMany()
+  let settingsRecords: any[] = []
+  try {
+    settingsRecords = await prisma.storeSettings.findMany()
+  } catch (err) {
+    console.error('[AdminSettingsPage Error]', err)
+  }
   const settingsMap: Record<string, string> = {
     store_name: 'Areum Cosmoherb',
     free_shipping_threshold: '999',

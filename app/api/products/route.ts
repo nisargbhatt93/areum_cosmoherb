@@ -51,25 +51,35 @@ export async function GET(request: Request) {
       orderBy.push({ isBestSeller: 'desc' })
   }
 
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: {
-        images: { where: { isPrimary: true }, take: 1 },
-        reviews: { where: { status: 'approved' }, select: { rating: true } },
-        category: { select: { name: true, slug: true } },
-      },
-      orderBy,
-      take: limit,
-      skip,
-    }),
-    prisma.product.count({ where }),
-  ])
+  try {
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          images: { where: { isPrimary: true }, take: 1 },
+          reviews: { where: { status: 'approved' }, select: { rating: true } },
+          category: { select: { name: true, slug: true } },
+        },
+        orderBy,
+        take: limit,
+        skip,
+      }),
+      prisma.product.count({ where }),
+    ])
 
-  return NextResponse.json({
-    products,
-    total,
-    page,
-    totalPages: Math.ceil(total / limit),
-  })
+    return NextResponse.json({
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    })
+  } catch (error) {
+    console.error('[Products API Error]', error)
+    return NextResponse.json({
+      products: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+    })
+  }
 }

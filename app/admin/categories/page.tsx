@@ -8,12 +8,17 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminCategoriesPage() {
-  const categories = await prisma.category.findMany({
-    include: {
-      _count: { select: { products: true } },
-    },
-    orderBy: { sortOrder: 'asc' },
-  })
+  let categories: any[] = []
+  try {
+    categories = await prisma.category.findMany({
+      include: {
+        _count: { select: { products: true } },
+      },
+      orderBy: { sortOrder: 'asc' },
+    })
+  } catch (err) {
+    console.error('[AdminCategoriesPage Error]', err)
+  }
 
   return (
     <div className="space-y-6">

@@ -31,14 +31,19 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
     where.status = status
   }
 
-  const orders = await prisma.order.findMany({
-    where,
-    include: {
-      items: true,
-      payment: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+  let orders: any[] = []
+  try {
+    orders = await prisma.order.findMany({
+      where,
+      include: {
+        items: true,
+        payment: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (err) {
+    console.error('[AdminOrdersPage Error]', err)
+  }
 
   return (
     <div className="space-y-6">
@@ -101,7 +106,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                       {order.guestName || 'Registered User'}
                     </td>
                     <td className="p-3.5">
-                      {order.items.reduce((s, i) => s + i.quantity, 0)} items
+                      {(order.items || []).reduce((s: number, i: any) => s + (i.quantity || 0), 0)} items
                     </td>
                     <td className="p-3.5 text-charcoal-500">{formatDate(order.createdAt)}</td>
                     <td className="p-3.5 font-extrabold text-brand-800">{formatPrice(order.total)}</td>

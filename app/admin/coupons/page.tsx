@@ -8,9 +8,14 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminCouponsPage() {
-  const coupons = await prisma.coupon.findMany({
-    orderBy: { createdAt: 'desc' },
-  })
+  let coupons: any[] = []
+  try {
+    coupons = await prisma.coupon.findMany({
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (err) {
+    console.error('[AdminCouponsPage Error]', err)
+  }
 
   return (
     <div className="space-y-6">

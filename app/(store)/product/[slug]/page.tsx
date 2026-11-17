@@ -82,10 +82,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <span>/</span>
           <Link href="/shop" className="hover:text-brand-700">Shop</Link>
           <span>/</span>
-          <Link href={`/category/${product.category.slug}`} className="hover:text-brand-700">
-            {product.category.name}
-          </Link>
-          <span>/</span>
+          {product.category && (
+            <>
+              <Link href={`/category/${product.category.slug}`} className="hover:text-brand-700">
+                {product.category.name}
+              </Link>
+              <span>/</span>
+            </>
+          )}
           <span className="text-charcoal-800 font-semibold truncate max-w-xs">{product.name}</span>
         </nav>
 
@@ -122,9 +126,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   You May Also Like
                 </h3>
               </div>
-              <Link href={`/category/${product.category.slug}`} className="text-xs font-bold text-brand-700 hover:text-brand-800">
-                View All {product.category.name} →
-              </Link>
+              {product.category && (
+                <Link href={`/category/${product.category.slug}`} className="text-xs font-bold text-brand-700 hover:text-brand-800">
+                  View All {product.category.name} →
+                </Link>
+              )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {relatedProducts.map((p) => (

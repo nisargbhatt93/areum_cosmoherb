@@ -11,13 +11,18 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminProductsPage() {
-  const products = await prisma.product.findMany({
-    include: {
-      category: { select: { name: true } },
-      images: { where: { isPrimary: true }, take: 1 },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+  let products: any[] = []
+  try {
+    products = await prisma.product.findMany({
+      include: {
+        category: { select: { name: true } },
+        images: { where: { isPrimary: true }, take: 1 },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (err) {
+    console.error('[AdminProductsPage Error]', err)
+  }
 
   return (
     <div className="space-y-6">
@@ -81,7 +86,7 @@ export default async function AdminProductsPage() {
                         </div>
                       </td>
 
-                      <td className="p-3.5 font-medium">{p.category.name}</td>
+                      <td className="p-3.5 font-medium">{p.category?.name || 'Uncategorized'}</td>
 
                       <td className="p-3.5">
                         <span className="font-bold text-brand-800">{formatPrice(p.price)}</span>

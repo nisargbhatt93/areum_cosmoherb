@@ -4,14 +4,19 @@ import { productSchema } from '@/lib/validators'
 import { slugify, generateSKU } from '@/lib/utils'
 
 export async function GET() {
-  const products = await prisma.product.findMany({
-    include: {
-      category: { select: { name: true, slug: true } },
-      images: { where: { isPrimary: true }, take: 1 },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
-  return NextResponse.json({ products })
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        category: { select: { name: true, slug: true } },
+        images: { where: { isPrimary: true }, take: 1 },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+    return NextResponse.json({ products })
+  } catch (error) {
+    console.error('[Admin Products API Error]', error)
+    return NextResponse.json({ products: [] })
+  }
 }
 
 export async function POST(request: Request) {

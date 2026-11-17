@@ -8,12 +8,17 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminReviewsPage() {
-  const reviews = await prisma.review.findMany({
-    include: {
-      product: { select: { name: true, slug: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+  let reviews: any[] = []
+  try {
+    reviews = await prisma.review.findMany({
+      include: {
+        product: { select: { name: true, slug: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (err) {
+    console.error('[AdminReviewsPage Error]', err)
+  }
 
   return (
     <div className="space-y-6">

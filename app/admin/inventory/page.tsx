@@ -8,17 +8,22 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminInventoryPage() {
-  const products = await prisma.product.findMany({
-    where: { status: 'active' },
-    include: {
-      category: { select: { name: true } },
-      inventoryTxns: {
-        take: 5,
-        orderBy: { createdAt: 'desc' },
+  let products: any[] = []
+  try {
+    products = await prisma.product.findMany({
+      where: { status: 'active' },
+      include: {
+        category: { select: { name: true } },
+        inventoryTxns: {
+          take: 5,
+          orderBy: { createdAt: 'desc' },
+        },
       },
-    },
-    orderBy: { stock: 'asc' }, // show lowest stock first!
-  })
+      orderBy: { stock: 'asc' }, // show lowest stock first!
+    })
+  } catch (err) {
+    console.error('[AdminInventoryPage Error]', err)
+  }
 
   return (
     <div className="space-y-6">

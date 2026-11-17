@@ -9,20 +9,25 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminCustomersPage() {
-  const customers = await prisma.user.findMany({
-    where: { role: 'customer' },
-    include: {
-      orders: {
-        select: { id: true, total: true, createdAt: true },
-        orderBy: { createdAt: 'desc' },
+  let customers: any[] = []
+  try {
+    customers = await prisma.user.findMany({
+      where: { role: 'customer' },
+      include: {
+        orders: {
+          select: { id: true, total: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+        },
+        addresses: {
+          where: { isDefault: true },
+          take: 1,
+        },
       },
-      addresses: {
-        where: { isDefault: true },
-        take: 1,
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (err) {
+    console.error('[AdminCustomersPage Error]', err)
+  }
 
   return (
     <div className="space-y-6">
@@ -55,7 +60,7 @@ export default async function AdminCustomersPage() {
               </thead>
               <tbody className="divide-y divide-charcoal-100">
                 {customers.map((c) => {
-                  const totalSpent = c.orders.reduce((sum, o) => sum + o.total, 0)
+                  const totalSpent = (c.orders || []).reduce((sum: number, o: any) => sum + (o.total || 0), 0)
                   const lastOrder = c.orders[0]
                   return (
                     <tr key={c.id} className="hover:bg-cream-50/50 transition-colors">

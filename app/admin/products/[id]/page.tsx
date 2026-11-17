@@ -13,22 +13,27 @@ interface EditProductPageProps {
 export default async function EditProductPage({ params }: EditProductPageProps) {
   const { id } = await params
 
-  const product = await prisma.product.findUnique({
-    where: { id },
-    include: {
-      images: { where: { isPrimary: true }, take: 1 },
-      category: true,
-    },
-  })
+  let product = null
+  let categories: any[] = []
+  try {
+    product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        images: { where: { isPrimary: true }, take: 1 },
+        category: true,
+      },
+    })
+    categories = await prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+    })
+  } catch (err) {
+    console.error('[EditProductPage Error]', err)
+  }
 
   if (!product) {
     notFound()
   }
-
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: 'asc' },
-  })
 
   return (
     <div className="space-y-6 max-w-4xl">
